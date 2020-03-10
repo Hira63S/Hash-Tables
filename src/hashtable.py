@@ -23,10 +23,10 @@ class HashTable:
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
-
+#       return hashlib.sha256(key.encode())
         return hash(key)
 
-
+# _ before the name of the function means we cannot use it outside of the class
     def _hash_djb2(self, key):
         '''
         Hash an arbitrary key using DJB2 hash
@@ -44,7 +44,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
-
+        # call hash and gives the index
         return self._hash(key) % self.capacity
 
 
@@ -132,25 +132,25 @@ class HashTable:
         new_storage = [None] * self.capacity
         for i in self.storage:
             if i != None:
-                index = i
+                index = i           # while at the index
                 while index:
-                    key = index.key
-                    value = index.value
-                    new = self._hash(key) % self.capacity
-                    node = new_storage[new]
-                    if node != None:
-                        while node:
-                            if node.next != None:
+                    key = index.key         # we set the key equal to index's key value
+                    value = index.value     # set the value equal to that
+                    new = self._hash(key) % self.capacity       # the new index
+                    node = new_storage[new]                    # create a new node w/ index
+                    if node != None:                           # if the node is not equal to None
+                        while node:                            # while at the node
+                            if node.next != None:              # we move to the next node
                                 node = node.next
                             else:
-                                node.next = LinkedPair(key, value)
+                                node.next = LinkedPair(key, value)         # create the key value pair at the next node
                                 node = None
                     else:
-                        new_storage[new] = LinkedPair(key, value)
+                        new_storage[new] = LinkedPair(key, value)         # if it is however empty, we will create a new linkedPair
 
-                    index = index.next
+                    index = index.next                       # and move onto the index. next
 
-        self.storage = new_storage
+        self.storage = new_storage                          # finally change the storage to the new storage. 
 
 
 if __name__ == "__main__":
