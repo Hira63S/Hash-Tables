@@ -3,7 +3,7 @@
 # '''
 class LinkedPair:
     def __init__(self, key, value):
-        self.key = key
+        self.key = key             # key is to find which one is correct
         self.value = value
         self.next = None
 
@@ -23,16 +23,20 @@ class HashTable:
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
+#       return hashlib.sha256(key.encode())
         return hash(key)
 
-
+# _ before the name of the function means we cannot use it outside of the class
     def _hash_djb2(self, key):
         '''
         Hash an arbitrary key using DJB2 hash
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        hash = 5381
+        for x in s:
+            hash = ((hash << 5) + hash) + ord(x)
+        return hash & 0xFFFFFFFF
 
 
     def _hash_mod(self, key):
@@ -40,6 +44,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
+        # call hash and gives the index
         return self._hash(key) % self.capacity
 
 
@@ -51,9 +56,21 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
-
+        # we have key, value, and next
+        new = self._hash(key) % self.capacity
+        if self.storage[new] != None:      # if this hash not empty
+            node = self.storage[new]       # we create a new node
+            while node:
+                if node.key == key:
+                    node.value = value
+                    break
+                elif node.next == None:
+                    node.next = LinkedPair(key, value)
+                    break
+                else:
+                    node = node.next
+        else:
+            self.storage[new] = LinkedPair(key, value)
 
     def remove(self, key):
         '''
@@ -63,7 +80,24 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+
+        index = self._hash(key) % self.capacity
+        if self.storage[index] == None:
+            print("ERROR: Key not found")
+        if self.storage[index].next == None:
+            if self.storage[index].key == key:
+                self.storage[index].value = None
+                return
+            else:
+                return('Key not found')
+        while self.storage[index]:
+            if self.storage[index].key == key:
+                self.storage[index].value = None
+                break
+            self.storage[index] = self.storage[index].next
+
+        return('Key not found')
+
 
 
     def retrieve(self, key):
@@ -74,8 +108,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash(key) % self.capacity
+        value = None
+        if self.storage[index] != None:
+            if self.storage[index].key == key:
+                value = self.storage[index].value
+                return value
+            else:      # iterate
+                self.storage[index] = self.storage[index].next
+        else:
+            print("Error: No values found")
 
     def resize(self):
         '''
@@ -85,7 +127,30 @@ class HashTable:
         Fill this in.
         '''
         pass
+        # first thing to double the capacity:
+        self.capacity *= 2
+        new_storage = [None] * self.capacity
+        for i in self.storage:
+            if i != None:
+                index = i           # while at the index
+                while index:
+                    key = index.key         # we set the key equal to index's key value
+                    value = index.value     # set the value equal to that
+                    new = self._hash(key) % self.capacity       # the new index
+                    node = new_storage[new]                    # create a new node w/ index
+                    if node != None:                           # if the node is not equal to None
+                        while node:                            # while at the node
+                            if node.next != None:              # we move to the next node
+                                node = node.next
+                            else:
+                                node.next = LinkedPair(key, value)         # create the key value pair at the next node
+                                node = None
+                    else:
+                        new_storage[new] = LinkedPair(key, value)         # if it is however empty, we will create a new linkedPair
 
+                    index = index.next                       # and move onto the index. next
+
+        self.storage = new_storage                          # finally change the storage to the new storage. 
 
 
 if __name__ == "__main__":
